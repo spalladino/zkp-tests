@@ -13,5 +13,8 @@
     "@nomicfoundation/hardhat-toolbox": "^2.0.0",
     "hardhat": "^2.12.3",
     "snarkjs": "^0.5.0"
+  },
+  "dependencies": {
+    "circomlib": "^2.0.5"
   }
 }

@@ -1,3 +1,4 @@
 build/
 proofs/
 inputs/*.wtns
+inputs/*.wtns.json
