@@ -1,4 +1,5 @@
 /node_modules
 /circuits/*/build
 /circuits/*/proofs
+/circuits/*/contract
 /artifacts

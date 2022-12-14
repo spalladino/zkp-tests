@@ -4,12 +4,14 @@ all: multiplier2 advent2
 
 .SECONDARY:
 
-multiplier2: circuits/multiplier2/build/main.acir
-advent2: circuits/advent2/build/main.acir
+CIRCUITS := multiplier2 advent2
+
+multiplier2: contracts/multiplier2.sol
+advent2: contracts/advent2.sol
 
 circuits/%/build/main.acir: circuits/%/src/main.nr
 	@echo Building $*...
-	cd circuits/$* && nargo compile --witness $*
+	cd circuits/$* && nargo compile --witness main
 	@echo
 
 circuits/%/proofs/main.proof: circuits/%/build/main.acir
@@ -17,8 +19,20 @@ circuits/%/proofs/main.proof: circuits/%/build/main.acir
 	cd circuits/$* && nargo prove main
 	@echo
 
+contracts/%.sol: circuits/%/build/main.acir
+	@echo Generating contract for $*...
+	cd circuits/$* && nargo contract
+	mv circuits/$*/contract/plonk_vk.sol contracts/$*.sol
+	sed -i 's/pragma solidity .*/pragma solidity >=0.8.0;'/ contracts/$*.sol
+	@echo
+
 verify/%: circuits/%/proofs/main.proof
 	@echo Verifying proof for $*...
 	cd circuits/$* && nargo verify main
+	@echo
+
+test: $(CIRCUITS)
+	@echo Running hardhat tests...
+	yarn -s hardhat test
 	@echo
 
