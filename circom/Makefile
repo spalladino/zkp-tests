@@ -1,4 +1,4 @@
-all: multiplier2
+all: multiplier2 advent2
 
 .PHONY: contracts test
 

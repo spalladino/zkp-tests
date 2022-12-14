@@ -1,0 +1,4 @@
+/node_modules
+/circuits/*/build
+/circuits/*/proofs
+/artifacts
