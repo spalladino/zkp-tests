@@ -10,5 +10,7 @@ name = "fibo1"
 path = "src/fibo1.rs"
 
 [dependencies]
-halo2_proofs = "0.2.0"
+halo2_proofs = { git = "https://github.com/zcash/halo2/", features = ["dev-graph"] }
 plotters = "0.3.0"
+group = "0.13"
+tabbycat = "0.1.2"

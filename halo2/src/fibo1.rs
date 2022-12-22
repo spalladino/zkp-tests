@@ -1,13 +1,13 @@
 use std::marker::PhantomData;
 
+use group::ff::Field;
 use halo2_proofs::{
-    arithmetic::FieldExt,
     circuit::*,
     plonk::*, poly::Rotation, pasta::Fp, dev::MockProver,
 };
 
 #[derive(Debug, Clone)]
-struct ACell<F: FieldExt>(AssignedCell<F,F>);
+struct ACell<F: Field>(AssignedCell<F,F>);
 
 #[derive(Debug, Clone)]
 struct FiboConfig {
@@ -16,12 +16,12 @@ struct FiboConfig {
     pub instance: Column<Instance>,
 }
 
-struct FiboChip<F: FieldExt> {
+struct FiboChip<F: Field> {
     config: FiboConfig,
     _marker: PhantomData<F>,
 }
 
-impl<F: FieldExt> FiboChip<F> {
+impl<F: Field> FiboChip<F> {
     fn construct(config: FiboConfig) -> Self {
         Self { config, _marker: PhantomData }
     }
@@ -132,7 +132,7 @@ struct MyCircuit<F> {
     pub b: Value<F>,
 }
 
-impl<F: FieldExt> Circuit<F> for MyCircuit<F> {
+impl<F: Field> Circuit<F> for MyCircuit<F> {
     type Config = FiboConfig;
     type FloorPlanner = SimpleFloorPlanner;
 
@@ -190,11 +190,12 @@ fn main() {
     let prover = MockProver::run(k, &circuit, vec![public_input.clone()]).unwrap();
     prover.assert_satisfied();
 
-    // use plotters::prelude::*;
-    // let root = BitMapBackend::new("fibo1-layout.png", (1024, 3096)).into_drawing_area();
-    // root.fill(&WHITE).unwrap();
-    // let root = root.titled("Fibo 1 Layout", ("sans-serif", 60)).unwrap();
-    // halo2_proofs::dev::CircuitLayout::default()
-    //     .render(4, &circuit, &root)
-    //     .unwrap();
+    // Draw circuit!
+    use plotters::prelude::*;
+    let root = BitMapBackend::new("img/fibo1-layout.png", (1024, 3096)).into_drawing_area();
+    root.fill(&WHITE).unwrap();
+    let root = root.titled("Fibo1 Layout", ("sans-serif", 60)).unwrap();
+    halo2_proofs::dev::CircuitLayout::default()
+        .render(4, &circuit, &root)
+        .unwrap();
 }
