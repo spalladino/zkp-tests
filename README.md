@@ -2,9 +2,9 @@
 
 The purpose of this repo is just to play around with general-purpose languages for generating zero-knowledge proofs, and compare them when working with the same example problem. The languages used so far are:
 
-- [Circom](/circom/)
-- [Halo2](/halo2/)
-- [Noir](/noir/)
+- [Circom](/circom/circuits/advent2.circom)
+- [Halo2](/halo2/src/advent2.rs)
+- [Noir](/noir/circuits/advent2/src/main.nr)
 
 For each language, there is a circuit that generates and verifies a zero-knowledge proof for the problem presented in [Day 2 of Advent of Code 2022](https://adventofcode.com/2022/day/2), which asks you to calculate the score in a game of several rounds of rock-paper-scissors. Given a set of rounds, the score is calculated as 6 points if you win, 3 on a draw, 0 on a loss, plus 1, 2, or 3 points depending on whether you played rock, paper, or scissors. 
 
