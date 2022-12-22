@@ -10,4 +10,5 @@ name = "fibo1"
 path = "src/fibo1.rs"
 
 [dependencies]
-halo2_proofs = "0.1.0"
+halo2_proofs = "0.2.0"
+plotters = "0.3.0"

@@ -55,7 +55,7 @@ impl<F: FieldExt> FiboChip<F> {
         FiboConfig { advice: [col_a,col_b,col_c], selector, instance }
     }
     
-    fn assign_first_row(&self, mut layouter: impl Layouter<F>, a: Option<F>, b: Option<F>) -> Result<(ACell<F>, ACell<F>, ACell<F>), Error> {
+    fn assign_first_row(&self, mut layouter: impl Layouter<F>, a: Value<F>, b: Value<F>) -> Result<(ACell<F>, ACell<F>, ACell<F>), Error> {
         layouter.assign_region(
             || "first row",
             |mut region| {
@@ -66,14 +66,14 @@ impl<F: FieldExt> FiboChip<F> {
                     || "a", 
                     self.config.advice[0], 
                     0, 
-                    || a.ok_or(Error::Synthesis)
+                    || a
                 ).map(ACell)?;
 
                 let b_cell = region.assign_advice(
                     || "b", 
                     self.config.advice[1], 
                     0, 
-                    || b.ok_or(Error::Synthesis)
+                    || b
                 ).map(ACell)?;
 
                 // Assign a+b to the c cell
@@ -83,7 +83,7 @@ impl<F: FieldExt> FiboChip<F> {
                     || "c", 
                     self.config.advice[2],
                     0, 
-                    || c_val.ok_or(Error::Synthesis)
+                    || c_val
                 ).map(ACell)?;
 
                 Ok((a_cell, b_cell, c_cell))
@@ -112,7 +112,7 @@ impl<F: FieldExt> FiboChip<F> {
                     || "c", 
                     self.config.advice[2], 
                     0, 
-                    || c_val.ok_or(Error::Synthesis)
+                    || c_val
                 ).map(ACell)?;
 
                 Ok(c_cell)
@@ -128,8 +128,8 @@ impl<F: FieldExt> FiboChip<F> {
 
 #[derive(Default)]
 struct MyCircuit<F> {
-    pub a: Option<F>,
-    pub b: Option<F>,
+    pub a: Value<F>,
+    pub b: Value<F>,
 }
 
 impl<F: FieldExt> Circuit<F> for MyCircuit<F> {
@@ -180,13 +180,21 @@ fn main() {
     let a = Fp::from(1);
     let b = Fp::from(1);
     let out = Fp::from(55);
-    
+
     let circuit = MyCircuit {
-        a: Some(a), b: Some(b),
+        a: Value::known(a), b: Value::known(b),
     };
 
     let public_input = vec![a,b,out];
 
     let prover = MockProver::run(k, &circuit, vec![public_input.clone()]).unwrap();
     prover.assert_satisfied();
+
+    // use plotters::prelude::*;
+    // let root = BitMapBackend::new("fibo1-layout.png", (1024, 3096)).into_drawing_area();
+    // root.fill(&WHITE).unwrap();
+    // let root = root.titled("Fibo 1 Layout", ("sans-serif", 60)).unwrap();
+    // halo2_proofs::dev::CircuitLayout::default()
+    //     .render(4, &circuit, &root)
+    //     .unwrap();
 }
