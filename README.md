@@ -13,3 +13,5 @@ The circuits in this repo generate a proof that the prover knows a set of rounds
 - The private inputs are the arrays of choices by each player on each round, where 0 is rock, 1 is paper, and 2 is scissors
 - The public value is the total score achieved by the second player
 - The proof proves that the public score corresponds to the private inputs, and that all inputs are valid
+
+> :warning: I wrote these circuits as a means to learn these languages. I am definitely not an expert in any of them, so please take everything you see here with a pinch of salt.
