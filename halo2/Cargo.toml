@@ -3,11 +3,13 @@ name = "halo2"
 version = "0.1.0"
 edition = "2021"
 
-# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
-
 [[bin]]
 name = "fibo1"
 path = "src/fibo1.rs"
+
+[[bin]]
+name = "advent2"
+path = "src/advent2.rs"
 
 [dependencies]
 halo2_proofs = { git = "https://github.com/zcash/halo2/", features = ["dev-graph"] }
