@@ -6,8 +6,8 @@ all: multiplier2 advent2
 
 CIRCUITS := multiplier2 advent2
 
-multiplier2: contracts/multiplier2.sol
-advent2: contracts/advent2.sol
+multiplier2: verify/multiplier2
+advent2: verify/advent2
 
 circuits/%/build/main.acir: circuits/%/src/main.nr
 	@echo Building $*...
