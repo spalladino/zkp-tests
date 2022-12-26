@@ -2,7 +2,7 @@ all: multiplier2 advent2
 
 .PHONY: contracts test
 
-CIRCUITS := multiplier2 advent2
+CIRCUITS := multiplier2 advent2 iszeroright iszerowrong iszeroevil
 
 # Build verifying contracts
 contracts: $(foreach circuit,$(CIRCUITS),contracts/$(circuit).sol)
@@ -10,6 +10,9 @@ contracts: $(foreach circuit,$(CIRCUITS),contracts/$(circuit).sol)
 # Build circuit, create witness, create proof, and verify it
 multiplier2: verify/multiplier2
 advent2: verify/advent2
+iszeroright: verify/iszeroright
+iszerowrong: verify/iszerowrong
+iszeroevil: verify/iszeroevil
 
 # Do not delete intermediate files
 .SECONDARY:
@@ -25,6 +28,8 @@ build/%.r1cs: circuits/%.circom
 # Creates a witness out of the circuit and input
 inputs/%.wtns: build/%.r1cs inputs/%.json
 	@echo Generating witness for $@...
+	@echo -n "Input: "
+	@jq -c '.' inputs/$*.json
 	node build/$*_js/generate_witness.js \
 		build/$*_js/$*.wasm \
 		inputs/$*.json \
@@ -50,11 +55,25 @@ proofs/%/verification_key.json: proofs/pot12_0001.ptau build/%.r1cs
 	yarn -s snarkjs zkey export verificationkey proofs/$*/key_0001.zkey proofs/$*/verification_key.json
 	@echo
 
+# Use proving key of iszerowrong when creating contract for iszeroevil
+contracts/iszeroevil.sol: proofs/iszerowrong/verification_key.json
+	@echo Generating verifier contract...
+	mkdir -p contracts/
+	yarn -s snarkjs zkey export solidityverifier proofs/iszerowrong/key_0001.zkey contracts/iszeroevil.sol
+
 # Create a verifier contract out of a verification key
 contracts/%.sol: proofs/%/verification_key.json
 	@echo Generating verifier contract...
 	mkdir -p contracts/
 	yarn -s snarkjs zkey export solidityverifier proofs/$*/key_0001.zkey contracts/$*.sol
+
+# Use proving key of iszerowrong when creating proof for iszeroevil
+proofs/iszeroevil/proof.json: proofs/iszerowrong/verification_key.json inputs/iszeroevil.wtns
+	@echo Generating proof...
+	yarn -s snarkjs groth16 prove proofs/iszerowrong/key_0001.zkey inputs/iszeroevil.wtns proofs/iszeroevil/proof.json proofs/iszeroevil/public.json
+	@echo Output:
+	@jq -c '.' proofs/iszeroevil/public.json
+	@echo
 
 # Create proof for a given witness, given the verification key generated in phase 2
 proofs/%/proof.json: proofs/%/verification_key.json inputs/%.wtns
@@ -70,6 +89,12 @@ proofs/%/solidity-args.json: proofs/%/proof.json
 	yarn run -s snarkjs zkey export soliditycalldata proofs/$*/public.json proofs/$*/proof.json >> $@
 	echo ']' >> $@
 
+# Use iszerowrong verification key for iszeroevil
+verify/iszeroevil: proofs/iszeroevil/proof.json
+	@echo Verifying proof for $*...
+	yarn -s snarkjs groth16 verify proofs/iszerowrong/verification_key.json proofs/iszeroevil/public.json proofs/iszeroevil/proof.json
+	@echo
+	
 # Verify the proof
 verify/%: proofs/%/proof.json
 	@echo Verifying proof for $*...
@@ -77,7 +102,7 @@ verify/%: proofs/%/proof.json
 	@echo
 	
 # Test verifying contracts
-test: $(foreach circuit,$(CIRCUITS),proofs/$(circuit)/solidity-args.json)
+test: $(foreach circuit,$(CIRCUITS),proofs/$(circuit)/solidity-args.json contracts/$(circuit).sol)
 	@echo Running hardhat tests...
 	yarn -s hardhat test
 	@echo
