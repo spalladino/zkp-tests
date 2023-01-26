@@ -14,6 +14,7 @@ describe("verify", function () {
   );
 
   it('verifies multiplier2', testVerify(`multiplier2`));
+  it.only('verifies multipliersq', testVerify(`multipliersq`));
   it('verifies advent2', testVerify(`advent2`));
 
   it('verifies iszero-right', testVerify(`iszeroright`));

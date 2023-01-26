@@ -1,14 +1,15 @@
-all: multiplier2 advent2
+all: multiplier2 multipliersq advent2
 
 .PHONY: contracts test
 
-CIRCUITS := multiplier2 advent2 iszeroright iszerowrong iszeroevil
+CIRCUITS := multiplier2 multipliersq advent2 iszeroright iszerowrong iszeroevil
 
 # Build verifying contracts
 contracts: $(foreach circuit,$(CIRCUITS),contracts/$(circuit).sol)
 
 # Build circuit, create witness, create proof, and verify it
 multiplier2: verify/multiplier2
+multipliersq: verify/multipliersq
 advent2: verify/advent2
 iszeroright: verify/iszeroright
 iszerowrong: verify/iszerowrong
